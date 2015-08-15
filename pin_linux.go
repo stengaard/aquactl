@@ -1,37 +1,16 @@
 package main
 
 import (
-	"io"
 	"os"
 	"path"
 )
-
-type PinDirection bool
-
-const (
-	PinOut = PinDirection(false)
-	PinIn  = PinDirection(true)
-)
-
-type readWriteSeeker interface {
-	io.Reader
-	io.Writer
-	io.Closer
-}
-
-type DigitalPin interface {
-	SetDirection(PinDirection) error
-	WriteBool(bool) error
-	ReadBool() (bool, error)
-	Close() error
-}
 
 type sysFsPin struct {
 	dir readWriteSeeker
 	val readWriteSeeker
 }
 
-func SysFsPin(pinPath string) (DigitalPin, error) {
+func newDigitalPin(pin string) (DigitalPin, error) {
 	var err error
 	p := &sysFsPin{}
 
