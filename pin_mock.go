@@ -2,11 +2,14 @@
 
 package main
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
-func newDigitalPin(name string) (DigitalPin, error) {
+func newDigitalPin(pinid uint) (DigitalPin, error) {
 	return &mockPin{
-		name:  name,
+		name:  fmt.Sprintf("pin%d", pinid),
 		value: false,
 		dir:   PinOut,
 	}, nil

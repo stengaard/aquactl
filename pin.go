@@ -6,11 +6,11 @@ import (
 )
 
 // PinDirection determines if Reads or Writes can be done from a pin.
-type PinDirection bool
+type PinDirection string
 
 const (
-	PinOut = PinDirection(false)
-	PinIn  = PinDirection(true)
+	PinOut = "out"
+	PinIn  = "in"
 )
 
 var (
@@ -40,8 +40,8 @@ type DigitalPin interface {
 }
 
 // NewDigitalPin returns an implementation of DigitalPin.
-// The mapping from pinName to physical pins is platform dependendant.
+// The mapping from pinid to physical pins is platform dependendant.
 // Returns an error of the pin cannot be found.
-func NewDigitalPin(pinName string) (DigitalPin, error) {
-	return newDigitalPin(pinName)
+func NewDigitalPin(pinid uint) (DigitalPin, error) {
+	return newDigitalPin(pinid)
 }
