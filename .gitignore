@@ -1,2 +1,4 @@
-aquactl
-aquactl.pi
+.DS_Store
+bin
+pkg
+src/cmd/aquactl/aquactl
