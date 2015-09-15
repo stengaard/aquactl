@@ -90,8 +90,6 @@ func (s Schedule) NextTick() time.Duration {
 
 func stateIdx(t time.Time) int {
 
-	t = t.Round(durPrTick)
-
 	a := time.Duration(t.Hour()) * time.Hour
 	a += time.Duration(t.Minute()) * time.Minute
 	a += time.Duration(t.Second()) * time.Second
