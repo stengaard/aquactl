@@ -1,6 +1,11 @@
 package main
 
-import "time"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+	"time"
+)
 
 type LEDController struct {
 	LightConf
@@ -88,8 +93,61 @@ func (s Schedule) NextTick() time.Duration {
 	return timeTill(now, now+1)
 }
 
-func stateIdx(t time.Time) int {
+func (s Schedule) String() string {
 
+	out := []string{}
+	streak := s[0]
+	n := 0
+	for i := 0; i < len(s); i++ {
+		n++
+		if s[i] == streak && i < len(s)-1 {
+			continue
+		}
+
+		out = append(out, fmt.Sprintf("%t:%d", streak, n))
+		streak = s[i]
+		n = 1
+	}
+	return strings.Join(out, ",")
+
+}
+
+func (s *Schedule) FromString(in string) error {
+	phases := strings.Split(in, ",")
+	i := 0
+	for _, phase := range phases {
+		p := strings.Split(phase, ":")
+		if len(p) < 2 {
+			return fmt.Errorf("bad schedule: %s", s)
+		}
+
+		n, err := strconv.Atoi(p[1])
+		if err != nil {
+			return err
+		}
+
+		val := false
+		switch p[0] {
+		case "true":
+			val = true
+		case "false":
+			val = false
+		default:
+			return fmt.Errorf("bad value: %s", p[0])
+		}
+
+		fmt.Println(i, n, val)
+		// n-1 since it's now an index
+		for n > 0 && i < len(s) {
+			s[i] = LEDState(val)
+			n--
+			i++
+		}
+	}
+	return nil
+}
+
+func stateIdx(t time.Time) int {
 	a := time.Duration(t.Hour()) * time.Hour
 	a += time.Duration(t.Minute()) * time.Minute
 	a += time.Duration(t.Second()) * time.Second
@@ -111,4 +169,17 @@ func timeTill(from, to int) time.Duration {
 	}
 
 	return time.Duration((to - from)) * durPrTick
+}
+
+func (s Schedule) MarshalYAML() (interface{}, error) {
+	return s.String(), nil
+}
+
+func (s *Schedule) UnmarshalYAML(ufn func(interface{}) error) error {
+	in := ""
+	err := ufn(&in)
+	if err != nil {
+		return err
+	}
+	return s.FromString(in)
 }
